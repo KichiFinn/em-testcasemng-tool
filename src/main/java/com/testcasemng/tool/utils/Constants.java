@@ -2,6 +2,8 @@ package com.testcasemng.tool.utils;
 
 public interface Constants {
 
+    public static final String DATE_FORMAT = "MM/dd/yy HH:mm:ss";
+
     public static final String OLD_EXCEL_EXTENSION = "xls";
     public static final String NEW_EXCEL_EXTENSION = "xlsx";
     public static final String MARKDOWN_EXTENSION = "md";
@@ -19,13 +21,16 @@ public interface Constants {
     public static final String TEST_CASE_NAME = "Test Case Name";
     public static final String TEST_CASE_DESCRIPTION = "Test Case Description";
     public static final String TEST_CASE_CREATED_BY = "Created By";
+    public static final String TEST_CASE_CREATED_DATE = "Created Date";
     public static final String TEST_CASE_REVIEWED_BY = "Reviewed By";
+    public static final String TEST_CASE_REVIEWED_DATE = "Reviewed Date";
     public static final String TEST_CASE_VERSION = "Version";
     public static final String TEST_CASE_PRE_CONDITION = "Pre-conditions";
     public static final String TEST_CASE_POST_CONDITION = "Post-conditions";
     public static final String TEST_CASE_LOG = "Log";
+    public static final String TEST_CASE_LOCATION = "Test Case Location";
     public static final String TEST_CASE_TESTER_NAME = "Tester's Name";
-    public static final String TEST_CASE_DATE_TESTED = "Date Tested";
+    public static final String TEST_CASE_DATE_TESTED = "Date Tested (mm/dd/yy hh:mm:ss)";
     public static final String TEST_CASE_RESULTS = "Test Case Results";
     public static final String TEST_CASE_STEP_NO = "Step #";
     public static final String TEST_CASE_STEP_DETAILS = "Step Details";

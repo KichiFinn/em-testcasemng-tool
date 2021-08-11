@@ -5,6 +5,7 @@ import java.util.List;
 
 public class TestCaseTemplate {
     private String testcaseID;
+    private String testScriptLink;
     private String testcaseName;
     private String testcaseDesc;
     private String createdBy;
@@ -14,6 +15,8 @@ public class TestCaseTemplate {
     private String postCondition;
     private String log;
     private String testerName;
+    private Date createdDate;
+    private Date reviewedDate;
     private Date testDate;
     private String testResults;
 
@@ -126,4 +129,28 @@ public class TestCaseTemplate {
     }
 
     private List<TestStep> testSteps;
+
+    public String getTestScriptLink() {
+        return testScriptLink;
+    }
+
+    public void setTestScriptLink(String testScriptLink) {
+        this.testScriptLink = testScriptLink;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getReviewedDate() {
+        return reviewedDate;
+    }
+
+    public void setReviewedDate(Date reviewedDate) {
+        this.reviewedDate = reviewedDate;
+    }
 }

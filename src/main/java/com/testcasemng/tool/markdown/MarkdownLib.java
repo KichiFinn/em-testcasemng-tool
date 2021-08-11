@@ -1,7 +1,9 @@
 package com.testcasemng.tool.markdown;
 
 import com.testcasemng.tool.utils.Constants;
-import com.testcasemng.tool.utils.TestCaseTemplate;
+import com.testcasemng.tool.utils.FileUtils;
+
+import java.util.List;
 
 public class MarkdownLib {
 
@@ -11,7 +13,7 @@ public class MarkdownLib {
             sb.append(Constants.MARKDOWN_HEADER);
         sb.append(" ")
                 .append("[")
-                .append(value)
+                .append(FileUtils.escapeMarkdownSpecialCharacter(value))
                 .append("](")
                 .append(link)
                 .append(")")
@@ -24,21 +26,31 @@ public class MarkdownLib {
         for (int i = 0; i < level; i++)
             sb.append(Constants.MARKDOWN_HEADER);
         sb.append(" ")
-                .append(value.equals("") ? "N/A" : value)
+                .append(FileUtils.escapeMarkdownSpecialCharacter(value))
+                .append("\r\n");
+        return sb.toString();
+    }
+
+    public static String createUnorderedListItem(String value, int level) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < level; i++)
+            sb.append(Constants.MARKDOWN_LEVEL_SEPARATOR);
+        sb.append(Constants.MARKDOWN_LIST_SIGNAL)
+                .append(" ")
+                .append(FileUtils.escapeMarkdownSpecialCharacter(value))
                 .append("\r\n");
         return sb.toString();
     }
 
     public static String createUnorderedList(String value, int level) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < level; i++)
-            sb.append(Constants.MARKDOWN_LEVEL_SEPARATOR);
-        sb.append(Constants.MARKDOWN_LIST_SIGNAL)
-                .append(" ")
-                .append(value.equals("") ? "N/A" : value)
-                .append("\r\n");
+        for (String item: value.split("\n")) {
+            sb.append(createUnorderedListItem(item, level));
+        }
         return sb.toString();
     }
+
+
 
     public static String createHeaderAndList(String header, int headerLevel, String list, int listLevel) {
         StringBuilder sb = new StringBuilder();
@@ -53,7 +65,7 @@ public class MarkdownLib {
             sb.append(Constants.MARKDOWN_LEVEL_SEPARATOR);
         sb.append(Integer.toString(number))
                 .append(". ")
-                .append(value)
+                .append(FileUtils.escapeMarkdownSpecialCharacter(value))
                 .append("\r\n");
         return sb.toString();
     }

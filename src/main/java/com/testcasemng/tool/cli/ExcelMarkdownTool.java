@@ -34,7 +34,6 @@ public class ExcelMarkdownTool {
         CommandLine cmd = null;
         try {
             cmd = parser.parse(options, args);
-
             if (cmd.hasOption("f") && cmd.hasOption("i")) {
                 String fileName = cmd.getOptionValue("f");
                 if (FileUtils.getFileNameExtension(fileName).equalsIgnoreCase(Constants.MARKDOWN_EXTENSION))
@@ -45,6 +44,7 @@ public class ExcelMarkdownTool {
                     System.out.println("Error! This file extension is not support");
             } else if (cmd.hasOption("f") && cmd.hasOption("c")) {
                 String fileName = cmd.getOptionValue("f");
+                System.out.println("fileName= " + fileName);
                 if(FileUtils.getFileNameExtension(fileName).equalsIgnoreCase(Constants.MARKDOWN_EXTENSION))
                     Conversion.convertMarkdownToExcel(fileName);
                 else if (FileUtils.getFileNameExtension(fileName).equalsIgnoreCase(Constants.OLD_EXCEL_EXTENSION) ||
