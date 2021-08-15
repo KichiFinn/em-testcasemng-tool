@@ -2,6 +2,7 @@ package com.testcasemng.tool.cli;
 
 import com.testcasemng.tool.excel.ExcelTestCaseTemplate;
 import com.testcasemng.tool.markdown.MarkdownTestCaseTemplate;
+import com.testcasemng.tool.utils.Analysis;
 import com.testcasemng.tool.utils.Conversion;
 import com.testcasemng.tool.utils.FileUtils;
 import com.testcasemng.tool.utils.Constants;
@@ -22,6 +23,12 @@ public class ExcelMarkdownTool {
                 .desc("Convert test specifications between Excel and Markdown")
                 .required(false)
                 .build());
+        options.addOption(Option.builder("a")
+                .longOpt("analyze")
+                .hasArg(false)
+                .desc("Analyze test results")
+                .required(false)
+                .build());
         options.addOption(Option.builder("f")
                 .longOpt("file")
                 .hasArg(true)
@@ -31,7 +38,7 @@ public class ExcelMarkdownTool {
                 .build());
 
         CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = null;
+        CommandLine cmd;
         try {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("f") && cmd.hasOption("i")) {
@@ -52,17 +59,13 @@ public class ExcelMarkdownTool {
                     Conversion.convertExcelToMarkdown(fileName);
                 else
                     System.out.println("Error parsing command-line arguments!. Run -h for help");
-            } else if (cmd.hasOption("f") && cmd.hasOption("r")) {
-                System.out.println("---report---");
+            } else if (cmd.hasOption("f") && cmd.hasOption("a")) {
+                String fileName = cmd.getOptionValue("f");
+                Analysis.analyze(fileName);
             } else {
                 System.out.println("Error parsing command-line arguments!. Run -h for help");
             }
-            /*if (cmd.hasOption("f")) {
-                String[] files = cmd.getOptionValues("f");
-                System.out.println("Number of files: " + files.length);
-                System.out.println("FileName(s): " + String.join(", ", Arrays.asList(files)));
 
-            }*/
         } catch (ParseException pe) {
             System.out.println("Error parsing command-line arguments!");
             System.out.println("Please, follow the instructions below:");
@@ -74,8 +77,8 @@ public class ExcelMarkdownTool {
                     "java -jar em-testcasemng-tool.jar -c -f /path/to/directory/TestCase1.MD: Convert TestCase1.MD to TestCase1.xls\n" +
                     "java -jar em-testcasemng-tool.jar -c -f /path/to/directory/TestCase1.xls: Convert TestCase1.xls to TestCase1.MD\n" +
                     "java -jar em-testcasemng-tool.jar -c -f /path/to/directory/*.MD: Convert all Markdown files to Excel files\n" +
-                    "java -jar em-testcasemng-tool.jar -r -f /path/to/directory/TestCase1.MD: Report all history of TestCase1\n" +
-                    "java -jar em-testcasemng-tool.jar -r -f /path/to/directory/*.MD: Report all history of all test case in the directory\n" +
+                    "java -jar em-testcasemng-tool.jar -a -f /path/to/directory/TestCase1.MD: Analyze all historical test results of TestCase1\n" +
+                    "java -jar em-testcasemng-tool.jar -a -f /path/to/directory/*.MD: Analyze all test results (Markdown) in the directory\n" +
                     "options:\n", options );
             System.exit(1);
         }

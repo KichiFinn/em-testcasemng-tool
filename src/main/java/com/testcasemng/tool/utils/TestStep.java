@@ -13,15 +13,6 @@ public class TestStep {
 
     }
 
-    public TestStep(int no, String details, String data, String expectedResults, String actualResults, String finalResults) {
-        this.no = no;
-        this.details = details;
-        this.data = data;
-        this.expectedResults = expectedResults;
-        this.actualResults = actualResults;
-        this.finalResults = finalResults;
-    }
-
     public int getNo() {
         return no;
     }

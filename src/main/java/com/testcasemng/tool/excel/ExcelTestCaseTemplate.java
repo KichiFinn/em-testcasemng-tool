@@ -1,10 +1,7 @@
 package com.testcasemng.tool.excel;
 
 import com.testcasemng.tool.markdown.MarkdownTestCaseTemplate;
-import com.testcasemng.tool.utils.Constants;
-import com.testcasemng.tool.utils.FileUtils;
-import com.testcasemng.tool.utils.TestCaseTemplate;
-import com.testcasemng.tool.utils.TestStep;
+import com.testcasemng.tool.utils.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 
@@ -239,7 +236,7 @@ public class ExcelTestCaseTemplate {
                             for (int i = 0; i < steps.size(); i++) {
                                 TestStep step = steps.get(i);
                                 if (row.getRowNum() == sheet.getLastRowNum()) {
-                                    sheet.createRow(row.getRowNum()+1);
+                                    sheet.createRow(row.getRowNum() + 1);
                                     row = sheet.getRow(sheet.getLastRowNum());
                                     row.createCell(0).setCellValue(step.getNo());
                                     row.createCell(1).setCellValue(step.getDetails());
@@ -270,5 +267,120 @@ public class ExcelTestCaseTemplate {
         if (date == null)
             return "";
         return dateFormat.format(date);
+    }
+
+    public static void writeTotalAnalysisTemplateToFile(AnalysisTemplate template) throws IOException {
+        String excelFileName = System.getProperty("user.dir") + File.separator + "TotalAnalysis.xlsx";
+        System.out.println("Test results summary generated in " + excelFileName);
+
+        Workbook workbook = WorkbookFactory.create(true);
+        Sheet sheet = workbook.createSheet("Summary");
+
+        List<ShortTestResult> tests = template.getTests();
+        sheet.createRow(0);
+        sheet.getRow(0).createCell(0).setCellValue(Constants.TEST_CASE_ID);
+        sheet.getRow(0).createCell(1).setCellValue(Constants.TEST_CASE_NAME);
+        sheet.getRow(0).createCell(2).setCellValue(Constants.TEST_CASE_DATE_TESTED);
+        sheet.getRow(0).createCell(3).setCellValue(Constants.TEST_CASE_RESULTS);
+        int i = 1;
+        for (ShortTestResult test : tests) {
+            if (sheet.getRow(i) == null)
+                sheet.createRow(i);
+            sheet.getRow(i).createCell(0).setCellValue(test.getId());
+            sheet.getRow(i).createCell(1).setCellValue(test.getName());
+            sheet.getRow(i).createCell(2).setCellValue(getDateFormat(test.getDateTest(), Constants.DATE_FORMAT));
+            sheet.getRow(i).createCell(3).setCellValue(test.getResult());
+            i++;
+        }
+
+        if (sheet.getRow(1) == null)
+            sheet.createRow(1);
+        sheet.getRow(1).createCell(5).setCellValue(Constants.TEST_RESULT_PASS);
+        sheet.getRow(1).createCell(6).setCellValue(template.getPass());
+
+        if (sheet.getRow(2) == null)
+            sheet.createRow(2);
+        sheet.getRow(2).createCell(5).setCellValue(Constants.TEST_RESULT_FAIL);
+        sheet.getRow(2).createCell(6).setCellValue(template.getFail());
+
+        if (sheet.getRow(3) == null)
+            sheet.createRow(3);
+        sheet.getRow(3).createCell(5).setCellValue(Constants.TEST_RESULT_NOT_EXECUTED);
+        sheet.getRow(3).createCell(6).setCellValue(template.getNotExecuted());
+
+        if (sheet.getRow(4) == null)
+            sheet.createRow(4);
+        sheet.getRow(4).createCell(5).setCellValue(Constants.TEST_RESULT_SUSPENDED);
+        sheet.getRow(4).createCell(6).setCellValue(template.getSuspend());
+
+        if (sheet.getRow(5) == null)
+            sheet.createRow(5);
+        sheet.getRow(5).createCell(5).setCellValue(Constants.TEST_RESULT_TOTAL);
+        sheet.getRow(5).createCell(6).setCellValue(template.getTotal());
+
+        FileOutputStream outputStream = new FileOutputStream(excelFileName);
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+
+    }
+
+    public static void writeAnAnalysisTemplateToFile(AnalysisTemplate template, String fileName) throws IOException {
+        String excelFileName = System.getProperty("user.dir") + File.separator + fileName;
+        System.out.println("Test results summary generated in " + excelFileName);
+
+        Workbook workbook = WorkbookFactory.create(true);
+        Sheet sheet = workbook.createSheet("Summary");
+
+        List<ShortTestResult> tests = template.getTests();
+        sheet.createRow(0);
+        sheet.getRow(0).createCell(0).setCellValue(Constants.TEST_CASE_DATE_TESTED);
+        sheet.getRow(0).createCell(1).setCellValue(Constants.TEST_CASE_RESULTS);
+        sheet.getRow(0).createCell(3).setCellValue(Constants.TEST_CASE_ID);
+        sheet.getRow(0).createCell(4).setCellValue(Constants.TEST_CASE_NAME);
+
+        int i = 1;
+        for (ShortTestResult test : tests) {
+            if (sheet.getRow(i) == null)
+                sheet.createRow(i);
+            if (i == 1) {
+                sheet.getRow(1).createCell(3).setCellValue(test.getId());
+                sheet.getRow(1).createCell(4).setCellValue(test.getName());
+            }
+            sheet.getRow(i).createCell(0).setCellValue(getDateFormat(test.getDateTest(), Constants.DATE_FORMAT));
+            sheet.getRow(i).createCell(1).setCellValue(test.getResult());
+            i++;
+        }
+
+        if (sheet.getRow(1) == null)
+            sheet.createRow(1);
+        sheet.getRow(1).createCell(6).setCellValue(Constants.TEST_RESULT_PASS);
+        sheet.getRow(1).createCell(7).setCellValue(template.getPass());
+
+        if (sheet.getRow(2) == null)
+            sheet.createRow(2);
+        sheet.getRow(2).createCell(6).setCellValue(Constants.TEST_RESULT_FAIL);
+        sheet.getRow(2).createCell(7).setCellValue(template.getFail());
+
+        if (sheet.getRow(3) == null)
+            sheet.createRow(3);
+        sheet.getRow(3).createCell(6).setCellValue(Constants.TEST_RESULT_NOT_EXECUTED);
+        sheet.getRow(3).createCell(7).setCellValue(template.getNotExecuted());
+
+        if (sheet.getRow(4) == null)
+            sheet.createRow(4);
+        sheet.getRow(4).createCell(6).setCellValue(Constants.TEST_RESULT_SUSPENDED);
+        sheet.getRow(4).createCell(7).setCellValue(template.getSuspend());
+
+        if (sheet.getRow(5) == null)
+            sheet.createRow(5);
+        sheet.getRow(5).createCell(6).setCellValue(Constants.TEST_RESULT_TOTAL);
+        sheet.getRow(5).createCell(7).setCellValue(template.getTotal());
+
+        FileOutputStream outputStream = new FileOutputStream(excelFileName);
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+
     }
 }

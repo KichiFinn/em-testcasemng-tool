@@ -3,8 +3,6 @@ package com.testcasemng.tool.markdown;
 import com.testcasemng.tool.utils.Constants;
 import com.testcasemng.tool.utils.FileUtils;
 
-import java.util.List;
-
 public class MarkdownLib {
 
     public static String createHeaderLink(String value, String link, int level) {
@@ -44,12 +42,11 @@ public class MarkdownLib {
 
     public static String createUnorderedList(String value, int level) {
         StringBuilder sb = new StringBuilder();
-        for (String item: value.split("\n")) {
+        for (String item : value.split("\n")) {
             sb.append(createUnorderedListItem(item, level));
         }
         return sb.toString();
     }
-
 
 
     public static String createHeaderAndList(String header, int headerLevel, String list, int listLevel) {
@@ -63,7 +60,7 @@ public class MarkdownLib {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < level; i++)
             sb.append(Constants.MARKDOWN_LEVEL_SEPARATOR);
-        sb.append(Integer.toString(number))
+        sb.append(number)
                 .append(". ")
                 .append(FileUtils.escapeMarkdownSpecialCharacter(value))
                 .append("\r\n");

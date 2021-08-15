@@ -1,13 +1,9 @@
 package com.testcasemng.tool.utils;
 
 import com.testcasemng.tool.markdown.MarkdownTestCaseTemplate;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.*;
-import org.eclipse.jgit.revplot.PlotCommitList;
-import org.eclipse.jgit.revplot.PlotLane;
-import org.eclipse.jgit.revplot.PlotWalk;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
@@ -15,19 +11,18 @@ import org.eclipse.jgit.treewalk.filter.PathFilter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class GitUtils {
-    private Repository repository;
-    private File currentFile;
+    private final Repository repository;
+    private final File currentFile;
     private String createBy;
     private Date createdDate;
     private String reviewedBy;
     private Date reviewedDate;
     private String testedBy;
-    private Date testedDate;
     private String latestLog;
     private String latestVersion;
 
@@ -37,34 +32,15 @@ public class GitUtils {
         this.setTestedBy("");
         this.setLatestLog("");
         this.setLatestVersion("");
-        this.setCurrentFile(file);
+        this.currentFile = file;
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
         repositoryBuilder.setMustExist(true);
         repositoryBuilder.findGitDir(file);
-        this.setRepository(repositoryBuilder.build());
+        this.repository = repositoryBuilder.build();
     }
 
     public boolean isInGitRepository() {
         return (repository.getDirectory() != null);
-    }
-
-    public void getChildOfMerge(RevCommit parent) throws IOException, GitAPIException {
-        try (Git git = new Git(repository)) {
-            String currentBranch = repository.getBranch();
-            Iterable<RevCommit> logs = git.log()
-                    .add(repository.resolve(currentBranch))
-                    .call();
-
-            for (RevCommit rev : logs) {
-                RevCommit[] revs = rev.getParents();
-                if(revs!= null && ArrayUtils.contains(revs, parent)) {
-                    PersonIdent authorIdent = rev.getAuthorIdent();
-                    this.setReviewedBy(String.format("%s<%s>", authorIdent.getName(), authorIdent.getEmailAddress()));
-                    this.setReviewedDate(authorIdent.getWhen());
-                }
-            }
-        }
-
     }
 
     public void parseLatestCommit() throws IOException, GitAPIException {
@@ -84,17 +60,14 @@ public class GitUtils {
     }
 
     public void parseGit() throws IOException, GitAPIException {
-        String ret = "";
-        int i = 0;
         try (Git git = new Git(repository)) {
             String currentBranch = repository.getBranch();
             Iterable<RevCommit> logs = git.log()
                     .add(repository.resolve(currentBranch))
-                    .addPath(currentFile.getName())
+                    .addPath(FileUtils.getRelativePathToGit(currentFile, repository.getDirectory()))
                     .call();
 
             RevCommit firstCommit = null;
-            RevCommit parent = null;
             RevCommit latestTest = null;
             RevCommit latestReview = null;
             for (RevCommit rev : logs) {
@@ -104,7 +77,6 @@ public class GitUtils {
                     firstCommit = rev;
 
                 TestCaseTemplate currentTemplate = loadFileContent(rev);
-                PersonIdent indent = rev.getAuthorIdent();
                 TestCaseTemplate parentTemplate = null;
                 if (rev.getParentCount() > 0)
                     parentTemplate = loadFileContent(rev.getParents()[0]);
@@ -122,17 +94,19 @@ public class GitUtils {
 
             }
             if (firstCommit != null) {
-                PersonIdent authorIdent = firstCommit.getAuthorIdent();
-                this.setCreateBy(String.format("%s<%s>", authorIdent.getName(), authorIdent.getEmailAddress()));
-                this.setCreatedDate(authorIdent.getWhen());
+                PersonIdent authorIndent = firstCommit.getAuthorIdent();
+                this.setCreateBy(String.format("%s<%s>", authorIndent.getName(), authorIndent.getEmailAddress()));
+                this.setCreatedDate(authorIndent.getWhen());
             }
             if (latestTest != null) {
-                PersonIdent authorIdent = latestTest.getAuthorIdent();
-                this.setTestedBy(String.format("%s<%s>", authorIdent.getName(), authorIdent.getEmailAddress()));
+                PersonIdent authorIndent = latestTest.getAuthorIdent();
+                this.setTestedBy(String.format("%s<%s>", authorIndent.getName(), authorIndent.getEmailAddress()));
             }
 
             if (latestReview != null) {
-                getChildOfMerge(latestReview);
+                PersonIdent authorIndent = latestReview.getAuthorIdent();
+                this.setReviewedBy(String.format("%s<%s>", authorIndent.getName(), authorIndent.getEmailAddress()));
+                this.setReviewedDate(authorIndent.getWhen());
             }
         }
     }
@@ -140,12 +114,12 @@ public class GitUtils {
     public static boolean isDesignChange(TestCaseTemplate current, TestCaseTemplate previous) {
         if (previous == null)
             return true;
-        if (previous != null && current != null) {
+        if (current != null) {
             if (!current.getTestcaseID().equals(previous.getTestcaseID()))
                 return true;
             if (!current.getTestcaseName().equals(previous.getTestcaseName()))
                 return true;
-            if (!current.getTestcaseName().equals(previous.getTestcaseName()))
+            if (!current.getTestScriptLink().equals(previous.getTestScriptLink()))
                 return true;
             if (!current.getTestcaseDesc().equals(previous.getTestcaseDesc()))
                 return true;
@@ -177,13 +151,12 @@ public class GitUtils {
         return false;
     }
 
-    public TestCaseTemplate loadFileContent(RevCommit rev) throws IOException, GitAPIException {
-        TestCaseTemplate template = null;
-        // now try to find a specific file
+    public TestCaseTemplate loadFileContent(RevCommit rev) throws IOException {
+        TestCaseTemplate template;
         try (TreeWalk treeWalk = new TreeWalk(repository)) {
             treeWalk.addTree(rev.getTree());
             treeWalk.setRecursive(true);
-            treeWalk.setFilter(PathFilter.create(currentFile.getName()));
+            treeWalk.setFilter(PathFilter.create(FileUtils.getRelativePathToGit(currentFile, repository.getDirectory())));
             if (!treeWalk.next()) {
                 return null;
             }
@@ -194,58 +167,51 @@ public class GitUtils {
         return template;
     }
 
-    /*public String getTesterPerson() throws IOException, GitAPIException {
-        String ret = "";
+
+    public AnalysisTemplate parseHistoricalResults() throws IOException, GitAPIException {
+        AnalysisTemplate template = new AnalysisTemplate();
+        List<ShortTestResult> tests = new ArrayList<>();
         try (Git git = new Git(repository)) {
             String currentBranch = repository.getBranch();
             Iterable<RevCommit> logs = git.log()
-                    .setMaxCount(1)
                     .add(repository.resolve(currentBranch))
-                    .addPath(currentFile.getName())
+                    .addPath(FileUtils.getRelativePathToGit(currentFile, repository.getDirectory()))
                     .call();
 
-            RevCommit lastCommit = logs.iterator().next();
-            if (lastCommit != null) {
-                PersonIdent authorIdent = lastCommit.getAuthorIdent();
-                ret = String.format("%s<%s>", authorIdent.getName(), authorIdent.getEmailAddress());
+            for (RevCommit rev : logs) {
+                TestCaseTemplate currentTemplate = loadFileContent(rev);
+                TestCaseTemplate parentTemplate = null;
+                if (rev.getParentCount() > 0)
+                    parentTemplate = loadFileContent(rev.getParents()[0]);
+                if (!isDesignChange(currentTemplate, parentTemplate)) {
+                    ShortTestResult result = new ShortTestResult();
+                    result.setResult(currentTemplate.getTestResults());
+                    result.setDateTest(currentTemplate.getTestDate());
+                    result.setId(currentTemplate.getTestcaseID());
+                    result.setName(currentTemplate.getTestcaseName());
+                    tests.add(result);
+                    switch (currentTemplate.getTestResults()) {
+                        case Constants.TEST_RESULT_PASS:
+                            template.setPass(template.getPass() + 1);
+                            break;
+                        case Constants.TEST_RESULT_FAIL:
+                            template.setFail(template.getFail() + 1);
+                            break;
+                        case Constants.TEST_RESULT_NOT_EXECUTED:
+                            template.setNotExecuted(template.getNotExecuted() + 1);
+                            break;
+                        case Constants.TEST_RESULT_SUSPENDED:
+                            template.setSuspend(template.getSuspend() + 1);
+                            break;
+                        default:
+                            template.setOthers(template.getOthers());
+                            break;
+                    }
+                }
             }
         }
-        return ret;
-    }*/
-
-    /*public Date getTestDate() throws IOException, GitAPIException {
-        Date ret = null;
-        try (Git git = new Git(repository)) {
-            String currentBranch = repository.getBranch();
-            Iterable<RevCommit> logs = git.log()
-                    .setMaxCount(1)
-                    .add(repository.resolve(currentBranch))
-                    .addPath(currentFile.getName())
-                    .call();
-
-            RevCommit lastCommit = logs.iterator().next();
-            if (lastCommit != null) {
-                PersonIdent authorIdent = lastCommit.getAuthorIdent();
-                ret = authorIdent.getWhen();
-            }
-        }
-        return ret;
-    }*/
-
-    public Repository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(Repository repository) {
-        this.repository = repository;
-    }
-
-    public File getCurrentFile() {
-        return currentFile;
-    }
-
-    public void setCurrentFile(File currentFile) {
-        this.currentFile = currentFile;
+        template.setTests(tests);
+        return template;
     }
 
     public String getCreateBy() {
@@ -286,14 +252,6 @@ public class GitUtils {
 
     public void setTestedBy(String testedBy) {
         this.testedBy = testedBy;
-    }
-
-    public Date getTestedDate() {
-        return testedDate;
-    }
-
-    public void setTestedDate(Date testedDate) {
-        this.testedDate = testedDate;
     }
 
     public String getLatestLog() {

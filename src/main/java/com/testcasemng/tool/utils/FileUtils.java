@@ -1,17 +1,11 @@
 package com.testcasemng.tool.utils;
 
-import java.io.Console;
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class FileUtils {
-
-    public static boolean isAbsolute(String input) {
-        return Paths.get(input).isAbsolute();
-    }
 
     public static boolean isRegular(String input) {
         return input.contains("*");
@@ -29,55 +23,32 @@ public final class FileUtils {
         return input.substring(0, input.indexOf('.'));
     }
 
-    public static boolean isMarkdownFile(String input) {
-        return getFileNameExtension(input).equalsIgnoreCase(Constants.MARKDOWN_EXTENSION);
-    }
-
-    public static boolean isExcelFile(String input) {
-        return (getFileNameExtension(input).equalsIgnoreCase(Constants.OLD_EXCEL_EXTENSION)
-                || getFileNameExtension(input).equalsIgnoreCase(Constants.NEW_EXCEL_EXTENSION));
-    }
-
     public static String getFileNameExtension(String input) {
         return input.substring(input.lastIndexOf('.') + 1);
     }
 
     public static List<File> getAllFilesWithExtension(String path) {
-        //List<File> files = new ArrayList<File>();
         String extension = getFileNameExtension(path);
         String directory = getRegularDirectory(path);
-        /*File folder = new File(getRegularDirectory(path));
-        File[] listOfFiles = folder.listFiles();
-        for (File file : listOfFiles) {
-            if (file.isFile()) {
-                String name = file.getName();
-                System.out.println(name + "\n");
-                if (getFileNameExtension(name).equalsIgnoreCase(extension)) {
-                    files.add(file);
-                }
-            } else if (file.isDirectory()) {
-                List<File> childrens = getAllFilesWithExtension(extension);
-                files.addAll(childrens);
-            }
-        }*/
-        List<File> files = new ArrayList<File>();getRecursiveFilesWithExtension(directory, extension);
         return getRecursiveFilesWithExtension(directory, extension);
     }
 
     public static List<File> getRecursiveFilesWithExtension(String directory, String extension) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         File folder = new File(directory);
         File[] listOfFiles = folder.listFiles();
-        for (File file : listOfFiles) {
-            if (file.isFile()) {
-                String name = file.getName();
-                System.out.println(name + "\n");
-                if (getFileNameExtension(name).equalsIgnoreCase(extension)) {
-                    files.add(file);
+        if (listOfFiles != null) {
+            for (File file : listOfFiles) {
+                if (file.isFile()) {
+                    String name = file.getName();
+                    System.out.println(name + "\n");
+                    if (getFileNameExtension(name).equalsIgnoreCase(extension) && !name.equalsIgnoreCase("readme.md")) {
+                        files.add(file);
+                    }
+                } else if (file.isDirectory() && !file.getName().equals(".git")) {
+                    List<File> children = getRecursiveFilesWithExtension(file.getPath(), extension);
+                    files.addAll(children);
                 }
-            } else if (file.isDirectory() && !file.getName().equals(".git")) {
-                List<File> children = getRecursiveFilesWithExtension(file.getPath(), extension);
-                files.addAll(children);
             }
         }
         return files;
@@ -90,8 +61,7 @@ public final class FileUtils {
         return input.replaceAll(regex, "\\\\$1");
     }
 
-    public static String findGitDirectory(File file) {
-
-        return "";
+    public static String getRelativePathToGit(File file, File gitDirectory) {
+        return gitDirectory.getParentFile().toURI().relativize(file.toURI()).getPath();
     }
 }
