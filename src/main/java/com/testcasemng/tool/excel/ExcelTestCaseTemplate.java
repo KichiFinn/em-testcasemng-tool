@@ -20,20 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ExcelTestCaseTemplate {
-    public static boolean initialize(String fullPath) throws Exception {
-        System.out.println("Initialize Test Case Specification Excel file: " + fullPath);
-        InputStream stream = null;
-        if (FileUtils.getFileNameExtension(fullPath).equalsIgnoreCase(Constants.OLD_EXCEL_EXTENSION))
-            stream = MarkdownTestCaseTemplate.class.getClassLoader().getResourceAsStream("Template1.xls");
-        else if (FileUtils.getFileNameExtension(fullPath).equalsIgnoreCase(Constants.NEW_EXCEL_EXTENSION))
-            stream = MarkdownTestCaseTemplate.class.getClassLoader().getResourceAsStream("Template1.xlsx");
-        if (stream != null) {
-            Files.copy(stream, Paths.get(fullPath), StandardCopyOption.REPLACE_EXISTING);
-            stream.close();
-        }
-        return true;
-    }
-
     public static List<TestCaseTemplate> readFromFile(File file) throws IOException {
         List<TestCaseTemplate> templates = new ArrayList<>();
 

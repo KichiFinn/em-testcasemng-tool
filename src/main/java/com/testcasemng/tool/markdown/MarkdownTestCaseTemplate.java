@@ -20,16 +20,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class MarkdownTestCaseTemplate {
-    public static boolean initialize(String fullPath) throws IOException {
-        System.out.println("Initialize Test Case Specification Markdown file: " + fullPath);
-        InputStream stream = MarkdownTestCaseTemplate.class.getClassLoader().getResourceAsStream("Template1.md");
-        if (stream != null) {
-            Files.copy(stream, Paths.get(fullPath), StandardCopyOption.REPLACE_EXISTING);
-            stream.close();
-        }
-
-        return true;
-    }
 
     public static TestCaseTemplate readFromStream(InputStream stream) throws IOException {
         TestCaseTemplate template = new TestCaseTemplate();

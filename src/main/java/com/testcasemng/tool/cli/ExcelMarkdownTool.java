@@ -2,10 +2,7 @@ package com.testcasemng.tool.cli;
 
 import com.testcasemng.tool.excel.ExcelTestCaseTemplate;
 import com.testcasemng.tool.markdown.MarkdownTestCaseTemplate;
-import com.testcasemng.tool.utils.Analysis;
-import com.testcasemng.tool.utils.Conversion;
-import com.testcasemng.tool.utils.FileUtils;
-import com.testcasemng.tool.utils.Constants;
+import com.testcasemng.tool.utils.*;
 import org.apache.commons.cli.*;
 
 public class ExcelMarkdownTool {
@@ -43,12 +40,8 @@ public class ExcelMarkdownTool {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("f") && cmd.hasOption("i")) {
                 String fileName = cmd.getOptionValue("f");
-                if (FileUtils.getFileNameExtension(fileName).equalsIgnoreCase(Constants.MARKDOWN_EXTENSION))
-                    MarkdownTestCaseTemplate.initialize(fileName);
-                else if (FileUtils.getFileNameExtension(fileName).equalsIgnoreCase(Constants.OLD_EXCEL_EXTENSION))
-                    ExcelTestCaseTemplate.initialize(fileName);
-                else
-                    System.out.println("Error! This file extension is not support");
+                TemplateInitialization initialization = new TemplateInitialization();
+                initialization.initTemplate(fileName);
             } else if (cmd.hasOption("f") && cmd.hasOption("c")) {
                 String fileName = cmd.getOptionValue("f");
                 System.out.println("fileName= " + fileName);
