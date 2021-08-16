@@ -1,42 +1,38 @@
 package com.testcasemng.tool.utils;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class FileUtils {
 
-    public static boolean isRegular(String input) {
-        return input.contains("*");
-    }
-
-    public static String getRegularDirectory(String input) {
-        return input.substring(0, input.lastIndexOf('*') - 1);
-    }
-
     public static String getFileName(String input) {
         return Paths.get(input).getFileName().toString();
     }
 
     public static String getFileNameWithoutExtension(String input) {
-        return input.substring(0, input.indexOf('.'));
+        String fileName = getFileName(input);
+        return fileName.substring(0, fileName.indexOf('.'));
     }
 
     public static String getFileNameExtension(String input) {
         return input.substring(input.lastIndexOf('.') + 1);
     }
 
-    public static List<File> getAllFilesWithExtension(String path) {
-        String extension = getFileNameExtension(path);
-        String directory = getRegularDirectory(path);
-        return getRecursiveFilesWithExtension(directory, extension);
+    public static boolean isMarkdownFile(String fullFileName) {
+        return getFileNameExtension(fullFileName).equalsIgnoreCase(Constants.MARKDOWN_EXTENSION);
     }
 
-    public static List<File> getRecursiveFilesWithExtension(String directory, String extension) {
+    public static boolean isExcelFile(String fullFileName) {
+        return (getFileNameExtension(fullFileName).equalsIgnoreCase(Constants.OLD_EXCEL_EXTENSION)
+                || getFileNameExtension(fullFileName).equalsIgnoreCase(Constants.NEW_EXCEL_EXTENSION));
+    }
+
+    public static List<File> getRecursiveFilesWithExtension(File directory, String extension) {
         List<File> files = new ArrayList<>();
-        File folder = new File(directory);
-        File[] listOfFiles = folder.listFiles();
+        File[] listOfFiles = directory.listFiles();
         if (listOfFiles != null) {
             for (File file : listOfFiles) {
                 if (file.isFile()) {
@@ -46,7 +42,7 @@ public final class FileUtils {
                         files.add(file);
                     }
                 } else if (file.isDirectory() && !file.getName().equals(".git")) {
-                    List<File> children = getRecursiveFilesWithExtension(file.getPath(), extension);
+                    List<File> children = getRecursiveFilesWithExtension(file, extension);
                     files.addAll(children);
                 }
             }
@@ -64,4 +60,19 @@ public final class FileUtils {
     public static String getRelativePathToGit(File file, File gitDirectory) {
         return gitDirectory.getParentFile().toURI().relativize(file.toURI()).getPath();
     }
+
+    public static InputStream getFileFromResourceAsStream(String fileName) {
+
+        // The class loader that loaded the class
+        ClassLoader classLoader = FileUtils.class.getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+
+        // the stream holding the file content
+        if (inputStream == null) {
+            throw new IllegalArgumentException("file not found! " + fileName);
+        } else {
+            return inputStream;
+        }
+    }
+
 }

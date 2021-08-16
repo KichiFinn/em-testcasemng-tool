@@ -39,10 +39,6 @@ public class GitUtils {
         this.repository = repositoryBuilder.build();
     }
 
-    public boolean isInGitRepository() {
-        return (repository.getDirectory() != null);
-    }
-
     public void parseLatestCommit() throws IOException, GitAPIException {
         try (Git git = new Git(repository)) {
             String currentBranch = repository.getBranch();

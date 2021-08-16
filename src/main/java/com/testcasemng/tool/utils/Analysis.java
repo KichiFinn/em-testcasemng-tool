@@ -3,6 +3,7 @@ package com.testcasemng.tool.utils;
 import com.testcasemng.tool.excel.ExcelTestCaseTemplate;
 import com.testcasemng.tool.markdown.MarkdownTestCaseTemplate;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,36 +12,38 @@ import java.util.List;
 public class Analysis {
 
     public static void analyze(String fullName) throws IOException, GitAPIException {
-        if (FileUtils.isRegular(fullName)) {
-            analyzeTestCases(fullName);
-        } else {
-            analyzeATestCase(fullName);
+        File file = new File(fullName);
+        if (file.isDirectory()) {
+            analyzeTestCases(file);
+        } else if (file.isFile()) {
+            analyzeATestCase(file);
         }
     }
 
-    public static void analyzeATestCase(String fullName) throws IOException, GitAPIException {
+    public static void analyzeATestCase(File file) throws IOException, GitAPIException {
         AnalysisTemplate template = null;
-        File file = new File(fullName);
-
-        GitUtils git = new GitUtils(file);
-        if (git.isInGitRepository()) {
+        try {
+            GitUtils git = new GitUtils(file);
             template = git.parseHistoricalResults();
-        } else {
-            System.out.println("Warning: file " + fullName + " is not in Git directory.\n" +
-                    "Missing information when analyze historical results.");
+        } catch (RepositoryNotFoundException | IllegalArgumentException e) {
+            System.out.println("Error: file " + file.getPath() + " is not in Git directory.\n" +
+                    "Can not get historical results");
+        } catch (Exception e) {
+            throw e;
         }
 
         if (template != null)
-            ExcelTestCaseTemplate.writeAnAnalysisTemplateToFile(template, FileUtils.getFileName(FileUtils.getFileNameWithoutExtension(fullName))
+            ExcelTestCaseTemplate.writeAnAnalysisTemplateToFile(template, FileUtils.getFileNameWithoutExtension(file.getName())
                     + "Analysis.xlsx");
     }
 
-    public static void analyzeTestCases(String fullName) throws IOException {
+    public static void analyzeTestCases(File directory) throws IOException {
         System.out.println("Generating test result summary ...");
         AnalysisTemplate template = new AnalysisTemplate();
-        List<File> files = FileUtils.getAllFilesWithExtension(fullName);
+        List<File> files = FileUtils.getRecursiveFilesWithExtension(directory, Constants.MARKDOWN_EXTENSION);
         for (File file : files) {
             TestCaseTemplate testCaseTemplate = MarkdownTestCaseTemplate.readFromFile(file);
+
             if (!testCaseTemplate.getTestcaseID().equals("")) {
                 ShortTestResult result = new ShortTestResult();
                 result.setId(testCaseTemplate.getTestcaseID());

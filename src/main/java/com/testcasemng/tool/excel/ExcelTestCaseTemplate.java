@@ -1,17 +1,11 @@
 package com.testcasemng.tool.excel;
 
-import com.testcasemng.tool.markdown.MarkdownTestCaseTemplate;
 import com.testcasemng.tool.utils.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -123,17 +117,14 @@ public class ExcelTestCaseTemplate {
         return template;
     }
 
-    public static boolean writeTemplateToFile(String fileName, TestCaseTemplate template) throws IOException {
-        InputStream stream = null;
+    public static void writeTemplateToFile(String fileName, TestCaseTemplate template) throws IOException {
         String extension = "xlsx";
         String excelFileName = System.getProperty("user.dir") + File.separator + fileName + "." + extension;
-        if (extension.equalsIgnoreCase(Constants.OLD_EXCEL_EXTENSION))
-            stream = MarkdownTestCaseTemplate.class.getClassLoader().getResourceAsStream("Template1.xls");
-        else if (extension.equalsIgnoreCase(Constants.NEW_EXCEL_EXTENSION))
-            stream = MarkdownTestCaseTemplate.class.getClassLoader().getResourceAsStream("Template1.xlsx");
+        TemplateInitialization.initTemplate(excelFileName);
+        FileInputStream inputStream = new FileInputStream(excelFileName);
 
-        if (stream != null) {
-            Workbook workbook = WorkbookFactory.create(stream);
+        if (inputStream != null) {
+            Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet sheet = workbook.getSheetAt(0);
             addTemplateDataToSheet(template, sheet);
             FileOutputStream outputStream = new FileOutputStream(excelFileName);
@@ -141,7 +132,6 @@ public class ExcelTestCaseTemplate {
             workbook.close();
             outputStream.close();
         }
-        return true;
     }
 
     public static void addTemplateDataToSheet(TestCaseTemplate template, Sheet sheet) {

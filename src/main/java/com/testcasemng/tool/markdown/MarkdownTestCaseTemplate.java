@@ -5,19 +5,14 @@ import com.testcasemng.tool.utils.TestCaseTemplate;
 import com.testcasemng.tool.utils.TestStep;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import org.commonmark.node.*;
 import org.commonmark.parser.Parser;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class MarkdownTestCaseTemplate {
 
@@ -70,13 +65,13 @@ public class MarkdownTestCaseTemplate {
     }
 
     public static void addTestSteps(Node node, TestCaseTemplate template) {
-        List<TestStep> steps = new ArrayList<TestStep>();
+        List<TestStep> steps = new ArrayList<>();
         Node listDetailHeader = node.getFirstChild();
         int no = 1;
         while (listDetailHeader != null) {
             TestStep step = new TestStep();
             Node bulletList = listDetailHeader.getLastChild().getFirstChild();
-            while (bulletList != null && bulletList instanceof ListItem) {
+            while (bulletList instanceof ListItem) {
                 Node header = bulletList.getFirstChild().getFirstChild();
                 if (header instanceof Text) {
                     switch (((Text) header).getLiteral()) {
@@ -142,10 +137,8 @@ public class MarkdownTestCaseTemplate {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat();
             sdf.applyPattern(Constants.DATE_FORMAT);
-            Date date = sdf.parse(dateStr);
-            return date;
-        }
-        catch (Exception e){
+            return sdf.parse(dateStr);
+        } catch (Exception e) {
             return new Date();
         }
     }
@@ -167,7 +160,7 @@ public class MarkdownTestCaseTemplate {
         return sb.toString();
     }
 
-    public static boolean writeTemplateToFile(String fileName, TestCaseTemplate template) throws IOException {
+    public static void writeTemplateToFile(String fileName, TestCaseTemplate template) throws IOException {
         String markdownFileName = System.getProperty("user.dir") + File.separator + fileName + ".MD";
         StringBuilder sb = new StringBuilder()
                 .append(MarkdownLib.createHeaderLink(template.getTestcaseID(), "", 1))
@@ -184,7 +177,6 @@ public class MarkdownTestCaseTemplate {
         BufferedWriter writer = new BufferedWriter(new FileWriter(markdownFileName));
         writer.write(sb.toString());
         writer.close();
-        return true;
     }
 
     public static String buildTestSteps(List<TestStep> steps) {
