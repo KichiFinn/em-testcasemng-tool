@@ -4,6 +4,8 @@ public interface Constants {
 
     String DATE_FORMAT = "MM/dd/yy HH:mm:ss";
 
+    String TEST_FIELD_NO_DATA = "N/A";
+
     String OLD_EXCEL_EXTENSION = "xls";
     String NEW_EXCEL_EXTENSION = "xlsx";
     String MARKDOWN_EXTENSION = "md";
@@ -42,4 +44,7 @@ public interface Constants {
     String TEST_CASE_EMPTY = "";
     String TEST_CASE_STEPS = "Test Steps";
     String TEST_CASE_STEP = "Step ";
+
+    String REPORT_SUMMARY= "Summary";
+    String REPORT_DETAILS= "Details";
 }

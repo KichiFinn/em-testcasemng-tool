@@ -147,6 +147,19 @@ public class GitUtils {
         return false;
     }
 
+    public static boolean isTestResultChange(TestCaseTemplate current, TestCaseTemplate previous) {
+        if (previous == null && current != null) {
+            if (!current.getTestResults().equalsIgnoreCase(Constants.TEST_FIELD_NO_DATA))
+                return true;
+        } else if (previous != null && current != null) {
+            if (!current.getTestDate().equals(previous.getTestDate()))
+                return true;
+            if (!current.getTestResults().equals(previous.getTestResults()))
+                return true;
+        }
+        return false;
+    }
+
     public TestCaseTemplate loadFileContent(RevCommit rev) throws IOException {
         TestCaseTemplate template;
         try (TreeWalk treeWalk = new TreeWalk(repository)) {
@@ -179,7 +192,7 @@ public class GitUtils {
                 TestCaseTemplate parentTemplate = null;
                 if (rev.getParentCount() > 0)
                     parentTemplate = loadFileContent(rev.getParents()[0]);
-                if (!isDesignChange(currentTemplate, parentTemplate)) {
+                if (isTestResultChange(currentTemplate, parentTemplate)) {
                     ShortTestResult result = new ShortTestResult();
                     result.setResult(currentTemplate.getTestResults());
                     result.setDateTest(currentTemplate.getTestDate());

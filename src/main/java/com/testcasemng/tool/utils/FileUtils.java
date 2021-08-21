@@ -1,7 +1,9 @@
 package com.testcasemng.tool.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +39,9 @@ public final class FileUtils {
             for (File file : listOfFiles) {
                 if (file.isFile()) {
                     String name = file.getName();
-                    System.out.println(name + "\n");
-                    if (getFileNameExtension(name).equalsIgnoreCase(extension) && !name.equalsIgnoreCase("readme.md")) {
+                    if (getFileNameExtension(name).equalsIgnoreCase(extension) &&
+                            !name.equalsIgnoreCase("readme.md") &&
+                            !name.equalsIgnoreCase("Template.md")) {
                         files.add(file);
                     }
                 } else if (file.isDirectory() && !file.getName().equals(".git")) {
@@ -61,6 +64,10 @@ public final class FileUtils {
         return gitDirectory.getParentFile().toURI().relativize(file.toURI()).getPath();
     }
 
+    public static String getRelativePath(File file, File gitDirectory) {
+        return gitDirectory.toURI().relativize(file.toURI()).getPath();
+    }
+
     public static InputStream getFileFromResourceAsStream(String fileName) {
 
         // The class loader that loaded the class
@@ -75,4 +82,10 @@ public final class FileUtils {
         }
     }
 
+    public static void createFolderIfNotExists (String path) throws IOException {
+        File folder = new File(path);
+        if(!folder.exists()) {
+            Files.createDirectories(Paths.get(path));
+        }
+    }
 }

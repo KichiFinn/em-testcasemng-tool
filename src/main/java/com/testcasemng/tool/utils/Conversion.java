@@ -11,33 +11,50 @@ import java.util.List;
 
 public class Conversion {
 
-    public static void convertDirectory(File directory) throws IOException, GitAPIException {
-
-        for (File file: FileUtils.getRecursiveFilesWithExtension(directory, Constants.MARKDOWN_EXTENSION)) {
-            convertMarkdownFileToExcelFile(file);
-        }
-
+    public static void convertExcelDirectory(File directory, String outFolder) throws IOException, GitAPIException {
         for (File file: FileUtils.getRecursiveFilesWithExtension(directory, Constants.NEW_EXCEL_EXTENSION)) {
-            convertExcelFileToMarkdownFile(file);
+            String relativePath = FileUtils.getRelativePath(file, directory);
+            String relativeFolder = "";
+            if (relativePath.contains("/"))
+                relativeFolder = relativePath.substring(0, relativePath.lastIndexOf("/"));
+            String out = outFolder+ File.separator + relativeFolder;
+            convertExcelFileToMarkdownFile(file, out);
         }
 
         for (File file: FileUtils.getRecursiveFilesWithExtension(directory, Constants.OLD_EXCEL_EXTENSION)) {
-            convertExcelFileToMarkdownFile(file);
+            String relativePath = FileUtils.getRelativePath(file, directory);
+            String relativeFolder = "";
+            if (relativePath.contains("/"))
+                relativeFolder = relativePath.substring(0, relativePath.lastIndexOf("/"));
+            String out = outFolder+ File.separator + relativeFolder;
+            convertExcelFileToMarkdownFile(file, out);
         }
     }
 
-    public static void convertExcelFileToMarkdownFile(File excelInput) throws IOException {
-        String markdownFileName = System.getProperty("user.dir") + File.separator + FileUtils.getFileNameWithoutExtension(excelInput.getName()) + ".md";
-        System.out.println("Convert " + excelInput.getAbsolutePath() + " to " + markdownFileName);
+    public static void convertMarkdownDirectory(File directory, String outFolder) throws IOException, GitAPIException {
+        for (File file: FileUtils.getRecursiveFilesWithExtension(directory, Constants.MARKDOWN_EXTENSION)) {
+            String relativePath = FileUtils.getRelativePath(file, directory);
+            String relativeFolder = "";
+            if (relativePath.contains("/"))
+                relativeFolder = relativePath.substring(0, relativePath.lastIndexOf("/"));
+            String out = outFolder+ File.separator + relativeFolder;
+            convertMarkdownFileToExcelFile(file, out);
+        }
+    }
+
+    public static void convertExcelFileToMarkdownFile(File excelInput, String outFolder) throws IOException {
+        FileUtils.createFolderIfNotExists(outFolder);
+        //String markdownFileName = System.getProperty("user.dir") + File.separator + FileUtils.getFileNameWithoutExtension(excelInput.getName()) + ".md";
+        System.out.println("Convert " + excelInput.getAbsolutePath() + " to " + outFolder);
         List<TestCaseTemplate> templates = ExcelTestCaseTemplate.readFromFile(excelInput);
         for (TestCaseTemplate template : templates) {
-            MarkdownTestCaseTemplate.writeTemplateToFile(FileUtils.getFileNameWithoutExtension(excelInput.getName()), template);
+            MarkdownTestCaseTemplate.writeTemplateToFile(FileUtils.getFileNameWithoutExtension(excelInput.getName()), outFolder, template);
         }
     }
 
-    public static void convertMarkdownFileToExcelFile(File markdownInput) throws IOException, GitAPIException {
-        String excelFileName = System.getProperty("user.dir") + File.separator + FileUtils.getFileNameWithoutExtension(markdownInput.getName()) + ".xls";
-        System.out.println("Convert " + markdownInput.getAbsolutePath() + " to " + excelFileName);
+    public static void convertMarkdownFileToExcelFile(File markdownInput, String outFolder) throws IOException, GitAPIException {
+        FileUtils.createFolderIfNotExists(outFolder);
+        System.out.println("Convert " + markdownInput.getAbsolutePath() + " to " + outFolder);
         TestCaseTemplate template = MarkdownTestCaseTemplate.readFromFile(markdownInput);
         try {
             GitUtils git = new GitUtils(markdownInput);
@@ -58,6 +75,6 @@ public class Conversion {
             throw e;
         }
 
-        ExcelTestCaseTemplate.writeTemplateToFile(FileUtils.getFileNameWithoutExtension(markdownInput.getName()), template);
+        ExcelTestCaseTemplate.writeTemplateToFile(FileUtils.getFileNameWithoutExtension(markdownInput.getName()), outFolder, template);
     }
 }

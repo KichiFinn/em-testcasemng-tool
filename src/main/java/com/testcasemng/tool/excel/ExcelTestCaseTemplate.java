@@ -117,9 +117,9 @@ public class ExcelTestCaseTemplate {
         return template;
     }
 
-    public static void writeTemplateToFile(String fileName, TestCaseTemplate template) throws IOException {
+    public static void writeTemplateToFile(String fileName, String outFolder, TestCaseTemplate template) throws IOException {
         String extension = "xlsx";
-        String excelFileName = System.getProperty("user.dir") + File.separator + fileName + "." + extension;
+        String excelFileName = outFolder + File.separator + fileName + "." + extension;
         TemplateInitialization.initTemplate(excelFileName);
         FileInputStream inputStream = new FileInputStream(excelFileName);
 
@@ -164,7 +164,7 @@ public class ExcelTestCaseTemplate {
                         break;
                     case Constants.TEST_CASE_CREATED_DATE:
                         cell = cellIterator.next();
-                        cell.setCellValue(getDateFormat(template.getCreatedDate(), Constants.DATE_FORMAT));
+                        cell.setCellValue(DateUtils.getDateFormat(template.getCreatedDate(), Constants.DATE_FORMAT));
                         break;
                     case Constants.TEST_CASE_REVIEWED_BY:
                         cell = cellIterator.next();
@@ -172,7 +172,7 @@ public class ExcelTestCaseTemplate {
                         break;
                     case Constants.TEST_CASE_REVIEWED_DATE:
                         cell = cellIterator.next();
-                        cell.setCellValue(getDateFormat(template.getReviewedDate(), Constants.DATE_FORMAT));
+                        cell.setCellValue(DateUtils.getDateFormat(template.getReviewedDate(), Constants.DATE_FORMAT));
                         break;
                     case Constants.TEST_CASE_LOCATION:
                         cell = cellIterator.next();
@@ -238,16 +238,10 @@ public class ExcelTestCaseTemplate {
         }
     }
 
-    public static String getDateFormat(Date date, String format) {
-        DateFormat dateFormat = new SimpleDateFormat(format);
-        if (date == null)
-            return "";
-        return dateFormat.format(date);
-    }
 
-    public static void writeTotalAnalysisTemplateToFile(AnalysisTemplate template) throws IOException {
-        String excelFileName = System.getProperty("user.dir") + File.separator + "TotalAnalysis.xlsx";
-        System.out.println("Test results summary generated in " + excelFileName);
+
+    public static void writeTotalAnalysisTemplateToFile(AnalysisTemplate template, String filePath) throws IOException {
+        System.out.println("Test results summary generated in " + filePath);
 
         Workbook workbook = WorkbookFactory.create(true);
         Sheet sheet = workbook.createSheet("Summary");
@@ -264,7 +258,7 @@ public class ExcelTestCaseTemplate {
                 sheet.createRow(i);
             sheet.getRow(i).createCell(0).setCellValue(test.getId());
             sheet.getRow(i).createCell(1).setCellValue(test.getName());
-            sheet.getRow(i).createCell(2).setCellValue(getDateFormat(test.getDateTest(), Constants.DATE_FORMAT));
+            sheet.getRow(i).createCell(2).setCellValue(DateUtils.getDateFormat(test.getDateTest(), Constants.DATE_FORMAT));
             sheet.getRow(i).createCell(3).setCellValue(test.getResult());
             i++;
         }
@@ -294,16 +288,15 @@ public class ExcelTestCaseTemplate {
         sheet.getRow(5).createCell(5).setCellValue(Constants.TEST_RESULT_TOTAL);
         sheet.getRow(5).createCell(6).setCellValue(template.getTotal());
 
-        FileOutputStream outputStream = new FileOutputStream(excelFileName);
+        FileOutputStream outputStream = new FileOutputStream(filePath);
         workbook.write(outputStream);
         workbook.close();
         outputStream.close();
 
     }
 
-    public static void writeAnAnalysisTemplateToFile(AnalysisTemplate template, String fileName) throws IOException {
-        String excelFileName = System.getProperty("user.dir") + File.separator + fileName;
-        System.out.println("Test results summary generated in " + excelFileName);
+    public static void writeAnAnalysisTemplateToFile(AnalysisTemplate template, String outfilePath) throws IOException {
+        System.out.println("Test results summary generated in " + outfilePath);
 
         Workbook workbook = WorkbookFactory.create(true);
         Sheet sheet = workbook.createSheet("Summary");
@@ -323,7 +316,7 @@ public class ExcelTestCaseTemplate {
                 sheet.getRow(1).createCell(3).setCellValue(test.getId());
                 sheet.getRow(1).createCell(4).setCellValue(test.getName());
             }
-            sheet.getRow(i).createCell(0).setCellValue(getDateFormat(test.getDateTest(), Constants.DATE_FORMAT));
+            sheet.getRow(i).createCell(0).setCellValue(DateUtils.getDateFormat(test.getDateTest(), Constants.DATE_FORMAT));
             sheet.getRow(i).createCell(1).setCellValue(test.getResult());
             i++;
         }
@@ -353,10 +346,9 @@ public class ExcelTestCaseTemplate {
         sheet.getRow(5).createCell(6).setCellValue(Constants.TEST_RESULT_TOTAL);
         sheet.getRow(5).createCell(7).setCellValue(template.getTotal());
 
-        FileOutputStream outputStream = new FileOutputStream(excelFileName);
+        FileOutputStream outputStream = new FileOutputStream(outfilePath);
         workbook.write(outputStream);
         workbook.close();
         outputStream.close();
-
     }
 }

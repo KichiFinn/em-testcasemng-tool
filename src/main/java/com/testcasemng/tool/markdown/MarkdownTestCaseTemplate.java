@@ -1,8 +1,6 @@
 package com.testcasemng.tool.markdown;
 
-import com.testcasemng.tool.utils.Constants;
-import com.testcasemng.tool.utils.TestCaseTemplate;
-import com.testcasemng.tool.utils.TestStep;
+import com.testcasemng.tool.utils.*;
 
 import java.io.*;
 
@@ -160,8 +158,8 @@ public class MarkdownTestCaseTemplate {
         return sb.toString();
     }
 
-    public static void writeTemplateToFile(String fileName, TestCaseTemplate template) throws IOException {
-        String markdownFileName = System.getProperty("user.dir") + File.separator + fileName + ".MD";
+    public static void writeTemplateToFile(String fileName, String outFolder, TestCaseTemplate template) throws IOException {
+        String markdownFileName = outFolder + File.separator + fileName + ".MD";
         StringBuilder sb = new StringBuilder()
                 .append(MarkdownLib.createHeaderLink(template.getTestcaseID(), "", 1))
                 .append(MarkdownLib.createHeaderAndList(Constants.TEST_CASE_NAME, 2, template.getTestcaseName(), 0))
@@ -198,4 +196,49 @@ public class MarkdownTestCaseTemplate {
         return sb.toString();
     }
 
+    public static void writeTotalAnalysisTemplateToFile(AnalysisTemplate template, String filePath) throws IOException {
+        StringBuilder sb = new StringBuilder()
+                .append(MarkdownLib.createHeader(Constants.REPORT_SUMMARY, 2))
+                .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_PASS + ": " + template.getPass(), 1))
+                .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_FAIL + ": " + template.getFail(), 1))
+                .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_NOT_EXECUTED + ": " + template.getNotExecuted(), 1))
+                .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_SUSPENDED + ": " + template.getSuspend(), 1))
+                .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_TOTAL + ": " + template.getTotal(), 1))
+                .append(MarkdownLib.createHeader(Constants.REPORT_DETAILS, 2));
+
+        for (int i = 0; i < template.getTests().size(); i++) {
+            ShortTestResult result = template.getTests().get(i);
+            sb.append(MarkdownLib.createOrderedList(i+1, result.getId(), 0))
+                    .append(MarkdownLib.createUnorderedList(result.getName(), 1))
+                    .append(MarkdownLib.createUnorderedList(DateUtils.getDateFormat(result.getDateTest(), Constants.DATE_FORMAT), 1))
+                    .append(MarkdownLib.createUnorderedList(result.getResult(), 1));
+        }
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+        writer.write(sb.toString());
+        writer.close();
+    }
+
+    public static void writeAnAnalysisTemplateToFile(AnalysisTemplate template, String outfilePath) throws IOException {
+        if (template.getTests().size() > 0 ) {
+            StringBuilder sb = new StringBuilder()
+                    .append(MarkdownLib.createHeader(Constants.REPORT_SUMMARY, 2))
+                    .append(MarkdownLib.createUnorderedList(template.getTests().get(0).getId(), 1))
+                    .append(MarkdownLib.createUnorderedList(template.getTests().get(0).getName(), 1))
+                    .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_PASS + ": " + template.getPass(), 1))
+                    .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_FAIL + ": " + template.getFail(), 1))
+                    .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_NOT_EXECUTED + ": " + template.getNotExecuted(), 1))
+                    .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_SUSPENDED + ": " + template.getSuspend(), 1))
+                    .append(MarkdownLib.createUnorderedList(Constants.TEST_RESULT_TOTAL + ": " + template.getTotal(), 1))
+                    .append(MarkdownLib.createHeader(Constants.REPORT_DETAILS, 2));
+            for (int i = 0; i < template.getTests().size(); i++) {
+                ShortTestResult result = template.getTests().get(i);
+                sb.append(MarkdownLib.createOrderedList(i+1, DateUtils.getDateFormat(result.getDateTest(), Constants.DATE_FORMAT), 0))
+                        .append(MarkdownLib.createUnorderedList(result.getResult(), 1));
+            }
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outfilePath));
+            writer.write(sb.toString());
+            writer.close();
+        }
+    }
 }
