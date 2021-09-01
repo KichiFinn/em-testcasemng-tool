@@ -21,7 +21,22 @@ public class TestCaseTemplate {
     private String testResults;
 
     public TestCaseTemplate() {
-
+        this.testcaseID = "";
+        this.testcaseID = "";
+        this.testScriptLink = "";
+        this.testcaseName = "";
+        this.testcaseDesc = "";
+        this.createdBy = "";
+        this.reviewedBy = "";
+        this.version = "";
+        this.preCondition = "";
+        this.postCondition = "";
+        this.log = "";
+        this.testerName = "";
+        this.createdDate = null;
+        this.reviewedDate = null;
+        this.testDate = null;
+        this.testResults = "";
     }
 
     public String getTestcaseID() {

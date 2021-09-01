@@ -10,7 +10,12 @@ public class TestStep {
     private String finalResults;
 
     public TestStep() {
-
+        this.no = 1;
+        this.details = "";
+        this.data = "";
+        this.expectedResults = "";
+        this.actualResults = "";
+        this.finalResults = "";
     }
 
     public int getNo() {

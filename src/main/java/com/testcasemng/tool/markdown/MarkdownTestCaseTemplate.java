@@ -40,12 +40,13 @@ public class MarkdownTestCaseTemplate {
 
     public static void addDataToTemplate(Node node, TestCaseTemplate template) {
         if (node instanceof Heading) {
-            Heading heading = (Heading) node;
-            if (heading.getLevel() == 1) {
+            //Heading heading = (Heading) node;
+            /*if (heading.getLevel() == 1) {
                 addIdAndLink(node, template);
             } else if (heading.getLevel() == 2) {
                 addHeaderLevel2(node, template);
-            }
+            }*/
+            addHeaderLevel2(node, template);
         } else if ((node instanceof OrderedList)) {
             addTestSteps(node, template);
         } /*else if ((node instanceof BulletList)) {
@@ -55,12 +56,12 @@ public class MarkdownTestCaseTemplate {
         }*/
     }
 
-    public static void addIdAndLink(Node node, TestCaseTemplate template) {
+    /*public static void addIdAndLink(Node node, TestCaseTemplate template) {
         Link link = (Link) node.getFirstChild();
         Text text = (Text) link.getFirstChild();
         template.setTestcaseID(text.getLiteral());
         template.setTestScriptLink(link.getDestination());
-    }
+    }*/
 
     public static void addTestSteps(Node node, TestCaseTemplate template) {
         List<TestStep> steps = new ArrayList<>();
@@ -107,6 +108,12 @@ public class MarkdownTestCaseTemplate {
         Node firstChild = node.getFirstChild();
         if (firstChild instanceof Text) {
             switch (((Text) firstChild).getLiteral()) {
+                case Constants.TEST_CASE_ID:
+                    template.setTestcaseID(getAllChildValue(node.getNext().getFirstChild()));
+                    break;
+                case Constants.TEST_CASE_SCRIPT_LOCATION:
+                    template.setTestScriptLink(getAllChildValue(node.getNext().getFirstChild()));
+                    break;
                 case Constants.TEST_CASE_NAME:
                     template.setTestcaseName(getAllChildValue(node.getNext().getFirstChild()));
                     break;
@@ -137,7 +144,7 @@ public class MarkdownTestCaseTemplate {
             sdf.applyPattern(Constants.DATE_FORMAT);
             return sdf.parse(dateStr);
         } catch (Exception e) {
-            return new Date();
+            return null;
         }
     }
 
@@ -161,7 +168,9 @@ public class MarkdownTestCaseTemplate {
     public static void writeTemplateToFile(String fileName, String outFolder, TestCaseTemplate template) throws IOException {
         String markdownFileName = outFolder + File.separator + fileName + ".MD";
         StringBuilder sb = new StringBuilder()
-                .append(MarkdownLib.createHeaderLink(template.getTestcaseID(), "", 1))
+                //.append(MarkdownLib.createHeaderLink(template.getTestcaseID(), "", 1))TEST_CASE_SCRIPT_LOCATION
+                .append(MarkdownLib.createHeaderAndList(Constants.TEST_CASE_ID, 2, template.getTestcaseID(), 0))
+                .append(MarkdownLib.createHeaderAndList(Constants.TEST_CASE_SCRIPT_LOCATION, 2, template.getTestScriptLink(), 0))
                 .append(MarkdownLib.createHeaderAndList(Constants.TEST_CASE_NAME, 2, template.getTestcaseName(), 0))
                 .append(MarkdownLib.createHeaderAndList(Constants.TEST_CASE_DESCRIPTION, 2, template.getTestcaseDesc(), 0))
                 .append(MarkdownLib.createHeaderAndList(Constants.TEST_CASE_PRE_CONDITION, 2, template.getPreCondition(), 0))
@@ -181,7 +190,7 @@ public class MarkdownTestCaseTemplate {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < steps.size(); i++) {
             TestStep step = steps.get(i);
-            sb.append(MarkdownLib.createOrderedList(step.getNo(), Constants.TEST_CASE_STEP + Integer.toString(step.getNo()), 0))
+            sb.append(MarkdownLib.createOrderedList(step.getNo(), Constants.TEST_CASE_STEP + step.getNo(), 0))
                     .append(MarkdownLib.createUnorderedList(Constants.TEST_CASE_STEP_DETAILS, 1))
                     .append(MarkdownLib.createUnorderedList(step.getDetails(), 2))
                     .append(MarkdownLib.createUnorderedList(Constants.TEST_CASE_STEP_DATA, 1))

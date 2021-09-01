@@ -6,10 +6,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -70,7 +67,7 @@ public class ExcelTestCaseTemplate {
                         cell = cellIterator.next();
                         template.setPostCondition(cell.getStringCellValue());
                         break;
-                    case Constants.TEST_CASE_LOCATION:
+                    case Constants.TEST_CASE_SCRIPT_LOCATION:
                         cell = cellIterator.next();
                         template.setTestScriptLink(cell.getStringCellValue());
                         break;
@@ -123,15 +120,13 @@ public class ExcelTestCaseTemplate {
         TemplateInitialization.initTemplate(excelFileName);
         FileInputStream inputStream = new FileInputStream(excelFileName);
 
-        if (inputStream != null) {
-            Workbook workbook = new XSSFWorkbook(inputStream);
-            Sheet sheet = workbook.getSheetAt(0);
-            addTemplateDataToSheet(template, sheet);
-            FileOutputStream outputStream = new FileOutputStream(excelFileName);
-            workbook.write(outputStream);
-            workbook.close();
-            outputStream.close();
-        }
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        addTemplateDataToSheet(template, sheet);
+        FileOutputStream outputStream = new FileOutputStream(excelFileName);
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
     }
 
     public static void addTemplateDataToSheet(TestCaseTemplate template, Sheet sheet) {
@@ -174,7 +169,7 @@ public class ExcelTestCaseTemplate {
                         cell = cellIterator.next();
                         cell.setCellValue(DateUtils.getDateFormat(template.getReviewedDate(), Constants.DATE_FORMAT));
                         break;
-                    case Constants.TEST_CASE_LOCATION:
+                    case Constants.TEST_CASE_SCRIPT_LOCATION:
                         cell = cellIterator.next();
                         cell.setCellValue(template.getTestScriptLink());
                         break;
@@ -237,7 +232,6 @@ public class ExcelTestCaseTemplate {
             }
         }
     }
-
 
 
     public static void writeTotalAnalysisTemplateToFile(AnalysisTemplate template, String filePath) throws IOException {

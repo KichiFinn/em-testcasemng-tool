@@ -21,6 +21,7 @@ public interface Constants {
     String TEST_RESULT_TOTAL = "Total";
 
     String TEST_CASE_ID = "Test Case ID";
+    String TEST_CASE_SCRIPT_LOCATION = "Test Case Script Location";
     String TEST_CASE_NAME = "Test Case Name";
     String TEST_CASE_DESCRIPTION = "Test Case Description";
     String TEST_CASE_CREATED_BY = "Created By";
@@ -31,10 +32,10 @@ public interface Constants {
     String TEST_CASE_PRE_CONDITION = "Pre-conditions";
     String TEST_CASE_POST_CONDITION = "Post-conditions";
     String TEST_CASE_LOG = "Log";
-    String TEST_CASE_LOCATION = "Test Case Location";
+    //String TEST_CASE_LOCATION = "Test Case Location";
     String TEST_CASE_TESTER_NAME = "Tester's Name";
     String TEST_CASE_DATE_TESTED = "Date Tested (mm/dd/yy hh:mm:ss)";
-    String TEST_CASE_RESULTS = "Test Case Results";
+    String TEST_CASE_RESULTS = "Test Case Results (Pass / Fail / Not executed / Suspended)";
     String TEST_CASE_STEP_NO = "Step #";
     String TEST_CASE_STEP_DETAILS = "Step Details";
     String TEST_CASE_STEP_DATA = "Test Data";

@@ -8,6 +8,13 @@ public class ShortTestResult {
     private String result;
     private Date dateTest;
 
+    public ShortTestResult() {
+        this.id = "";
+        this.name = "";
+        this.result = "";
+        this.dateTest = null;
+    }
+
     public String getId() {
         return id;
     }

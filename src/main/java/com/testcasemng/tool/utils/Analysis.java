@@ -7,9 +7,6 @@ import org.eclipse.jgit.errors.RepositoryNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class Analysis {
@@ -19,7 +16,7 @@ public class Analysis {
         FileUtils.createFolderIfNotExists(output);
         File outputFolder = new File(output);
         if (inputFile.isDirectory()) {
-            if (historical == true)
+            if (historical)
                 analyzeFolder(inputFile, outputFolder);
             else
                 analyzeTestCases(inputFile, outputFolder);
@@ -51,6 +48,7 @@ public class Analysis {
             System.out.println("Error: file " + inputFile.getPath() + " is not in Git directory.\n" +
                     "Can not get historical results");
         } catch (Exception e) {
+            System.out.println("Unknown error: " + e.getMessage() + " while process " + inputFile.getPath()+ "\n");
             throw e;
         }
 

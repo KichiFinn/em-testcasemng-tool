@@ -32,6 +32,8 @@ public class GitUtils {
         this.setTestedBy("");
         this.setLatestLog("");
         this.setLatestVersion("");
+        this.createdDate = null;
+        this.reviewedDate = null;
         this.currentFile = file;
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
         repositoryBuilder.setMustExist(true);
@@ -149,13 +151,11 @@ public class GitUtils {
 
     public static boolean isTestResultChange(TestCaseTemplate current, TestCaseTemplate previous) {
         if (previous == null && current != null) {
-            if (!current.getTestResults().equalsIgnoreCase(Constants.TEST_FIELD_NO_DATA))
-                return true;
+            return !current.getTestResults().equalsIgnoreCase(Constants.TEST_FIELD_NO_DATA);
         } else if (previous != null && current != null) {
             if (!current.getTestDate().equals(previous.getTestDate()))
                 return true;
-            if (!current.getTestResults().equals(previous.getTestResults()))
-                return true;
+            return !current.getTestResults().equals(previous.getTestResults());
         }
         return false;
     }

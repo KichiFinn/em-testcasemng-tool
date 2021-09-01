@@ -85,10 +85,7 @@ public class ExcelMarkdownTool {
             } else if (cmd.hasOption("f") && cmd.hasOption("a")) {
                 String fileName = cmd.getOptionValue("f");
                 String output = cmd.getOptionValue("o");
-                if (cmd.hasOption("h"))
-                    Analysis.analyze(fileName, output, true);
-                else
-                    Analysis.analyze(fileName, output, false);
+                Analysis.analyze(fileName, output, cmd.hasOption("h"));
             } else {
                 System.out.println("Error parsing command-line arguments!. Run -h for help");
             }

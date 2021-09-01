@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Conversion {
 
-    public static void convertExcelDirectory(File directory, String outFolder) throws IOException, GitAPIException {
+    public static void convertExcelDirectory(File directory, String outFolder) throws IOException {
         for (File file: FileUtils.getRecursiveFilesWithExtension(directory, Constants.NEW_EXCEL_EXTENSION)) {
             String relativePath = FileUtils.getRelativePath(file, directory);
             String relativeFolder = "";
@@ -72,6 +72,7 @@ public class Conversion {
             System.out.println("Warning: file " + markdownInput.getAbsolutePath() + " is not in Git directory.\n" +
                     "Missing information when convert to Excel.");
         } catch (Exception e) {
+            System.out.println("Unknown error: " + e.getMessage() + " while process " + markdownInput.getPath()+ "\n");
             throw e;
         }
 

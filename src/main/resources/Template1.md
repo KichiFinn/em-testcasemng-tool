@@ -1,4 +1,7 @@
-# [Your Test ID]()
+## Test Case ID
+* N/A
+## Test Case Script Location
+* N/A
 ## Test Case Name
 * N/A
 ## Test Case Description
@@ -9,8 +12,8 @@
 * N/A
 ## Date Tested (mm/dd/yy hh:mm:ss)
 * N/A
-## Test Case Results
-* N/A
+## Test Case Results (Pass / Fail / Not executed / Suspended)
+* Not executed
 ---
 ## Test Steps
 1. Step 1
@@ -23,5 +26,5 @@
 	* Actual Results
 		* N/A
 	* Pass / Fail / Not executed / Suspended
-		* N/A
+		* Not executed
 ---

@@ -50,8 +50,8 @@ public class MarkdownLib {
 
 
     public static String createHeaderAndList(String header, int headerLevel, String list, int listLevel) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(createHeader(header, headerLevel))
+        StringBuilder sb = new StringBuilder().
+                append(createHeader(header, headerLevel))
                 .append(createUnorderedList(list, listLevel));
         return sb.toString();
     }

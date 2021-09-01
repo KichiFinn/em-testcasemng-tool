@@ -34,10 +34,8 @@ public class TemplateInitialization {
     private static void initMarkdownTemplate(String fullPath) throws IOException {
         System.out.println("Initialize Test Case Specification Markdown file: " + fullPath);
         InputStream stream = FileUtils.getFileFromResourceAsStream("Template1.md");
-        if (stream != null) {
-            Files.copy(stream, Paths.get(fullPath), StandardCopyOption.REPLACE_EXISTING);
-            stream.close();
-        }
+        Files.copy(stream, Paths.get(fullPath), StandardCopyOption.REPLACE_EXISTING);
+        stream.close();
     }
 
 }
