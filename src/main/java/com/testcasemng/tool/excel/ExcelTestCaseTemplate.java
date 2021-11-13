@@ -244,16 +244,18 @@ public class ExcelTestCaseTemplate {
         sheet.createRow(0);
         sheet.getRow(0).createCell(0).setCellValue(Constants.TEST_CASE_ID);
         sheet.getRow(0).createCell(1).setCellValue(Constants.TEST_CASE_NAME);
-        sheet.getRow(0).createCell(2).setCellValue(Constants.TEST_CASE_DATE_TESTED);
-        sheet.getRow(0).createCell(3).setCellValue(Constants.TEST_CASE_RESULTS);
+        sheet.getRow(0).createCell(2).setCellValue(Constants.TEST_CASE__LOCATION);
+        sheet.getRow(0).createCell(3).setCellValue(Constants.TEST_CASE_DATE_TESTED);
+        sheet.getRow(0).createCell(4).setCellValue(Constants.TEST_CASE_RESULTS);
         int i = 1;
         for (ShortTestResult test : tests) {
             if (sheet.getRow(i) == null)
                 sheet.createRow(i);
             sheet.getRow(i).createCell(0).setCellValue(test.getId());
             sheet.getRow(i).createCell(1).setCellValue(test.getName());
-            sheet.getRow(i).createCell(2).setCellValue(DateUtils.getDateFormat(test.getDateTest(), Constants.DATE_FORMAT));
-            sheet.getRow(i).createCell(3).setCellValue(test.getResult());
+            sheet.getRow(i).createCell(2).setCellValue(test.getTestSpecificationLocation().substring(3));
+            sheet.getRow(i).createCell(3).setCellValue(DateUtils.getDateFormat(test.getDateTest(), Constants.DATE_FORMAT));
+            sheet.getRow(i).createCell(4).setCellValue(test.getResult());
             i++;
         }
 

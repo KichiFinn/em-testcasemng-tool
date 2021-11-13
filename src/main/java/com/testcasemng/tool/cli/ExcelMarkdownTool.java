@@ -4,6 +4,7 @@ import com.testcasemng.tool.utils.*;
 import org.apache.commons.cli.*;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class ExcelMarkdownTool {
     public static void main(String[] args) throws Exception {
@@ -36,6 +37,11 @@ public class ExcelMarkdownTool {
                 .longOpt("analyze")
                 .hasArg(false)
                 .desc("Analyze test results")
+                .required(false)
+                .build());
+        options.addOption(Option.builder("config")
+                .hasArg(false)
+                .desc("Analyze tests with config file")
                 .required(false)
                 .build());
         options.addOption(Option.builder("h")
@@ -71,13 +77,13 @@ public class ExcelMarkdownTool {
                 File file = new File(fileName);
                 if (file.isDirectory()) {
                     if(cmd.hasOption("m2e"))
-                        Conversion.convertMarkdownDirectory(file, output);
+                        Conversion.convertMarkdownDirectory(file, output, new ArrayList());
                     else if (cmd.hasOption("e2m"))
                         Conversion.convertExcelDirectory(file, output);
                     else
                         System.out.println("Error parsing command-line arguments!. Run -h for help");
                 } else if (file.isFile() && FileUtils.isMarkdownFile(fileName)) {
-                    Conversion.convertMarkdownFileToExcelFile(file, output);
+                    Conversion.convertMarkdownFileToExcelFile(file, output, new ArrayList());
                 } else if (file.isFile() && FileUtils.isExcelFile(fileName)) {
                     Conversion.convertExcelFileToMarkdownFile(file, output);
                 } else
@@ -86,7 +92,12 @@ public class ExcelMarkdownTool {
                 String fileName = cmd.getOptionValue("f");
                 String output = cmd.getOptionValue("o");
                 Analysis.analyze(fileName, output, cmd.hasOption("h"));
-            } else {
+            } else if (cmd.hasOption("f") && cmd.hasOption("config")) {
+                String fileName = cmd.getOptionValue("f");
+                Config config = new Config(fileName);
+                Analysis.analyze(config);
+                Conversion.convert(config);
+            }else {
                 System.out.println("Error parsing command-line arguments!. Run -h for help");
             }
 

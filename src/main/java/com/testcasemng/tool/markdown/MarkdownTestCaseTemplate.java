@@ -40,20 +40,8 @@ public class MarkdownTestCaseTemplate {
 
     public static void addDataToTemplate(Node node, TestCaseTemplate template) {
         if (node instanceof Heading) {
-            //Heading heading = (Heading) node;
-            /*if (heading.getLevel() == 1) {
-                addIdAndLink(node, template);
-            } else if (heading.getLevel() == 2) {
-                addHeaderLevel2(node, template);
-            }*/
             addHeaderLevel2(node, template);
-        } else if ((node instanceof OrderedList)) {
-            addTestSteps(node, template);
-        } /*else if ((node instanceof BulletList)) {
-
-        } else if ((node instanceof ThematicBreak)) {
-
-        }*/
+        }
     }
 
     /*public static void addIdAndLink(Node node, TestCaseTemplate template) {
@@ -131,6 +119,9 @@ public class MarkdownTestCaseTemplate {
                     break;
                 case Constants.TEST_CASE_RESULTS:
                     template.setTestResults(getAllChildValue(node.getNext().getFirstChild()));
+                    break;
+                case Constants.TEST_CASE_STEPS:
+                    addTestSteps(node.getNext(), template);
                     break;
                 default:
                     break;
@@ -218,7 +209,7 @@ public class MarkdownTestCaseTemplate {
         for (int i = 0; i < template.getTests().size(); i++) {
             ShortTestResult result = template.getTests().get(i);
             sb.append(MarkdownLib.createOrderedList(i+1, result.getId(), 0))
-                    .append(MarkdownLib.createUnorderedList(result.getName(), 1))
+                    .append(MarkdownLib.createUnorderedListLink(result.getName(), result.getTestSpecificationLocation(), 1))
                     .append(MarkdownLib.createUnorderedList(DateUtils.getDateFormat(result.getDateTest(), Constants.DATE_FORMAT), 1))
                     .append(MarkdownLib.createUnorderedList(result.getResult(), 1));
         }

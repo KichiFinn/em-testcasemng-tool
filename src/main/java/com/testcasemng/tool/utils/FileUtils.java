@@ -88,4 +88,15 @@ public final class FileUtils {
             Files.createDirectories(Paths.get(path));
         }
     }
+
+    public static File findAncestralFolderWithName(File file, String name) throws IOException {
+        File tmp = file;
+        while (tmp != null && !tmp.getName().equals(name)) {
+            tmp = tmp.getParentFile();
+        }
+        if (tmp == null)
+            return file;
+        else
+            return tmp;
+    }
 }

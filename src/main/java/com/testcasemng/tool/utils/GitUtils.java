@@ -153,8 +153,11 @@ public class GitUtils {
         if (previous == null && current != null) {
             return !current.getTestResults().equalsIgnoreCase(Constants.TEST_FIELD_NO_DATA);
         } else if (previous != null && current != null) {
-            if (!current.getTestDate().equals(previous.getTestDate()))
+            if ((current.getTestDate() == null && previous.getTestDate() != null)
+                    || (current.getTestDate() != null && previous.getTestDate() == null)
+                    || (current.getTestDate() != null && previous.getTestDate() != null && !current.getTestDate().equals(previous.getTestDate())))
                 return true;
+
             return !current.getTestResults().equals(previous.getTestResults());
         }
         return false;

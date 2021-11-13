@@ -7,11 +7,13 @@ public class ShortTestResult {
     private String name;
     private String result;
     private Date dateTest;
+    private String testSpecificationLocation;
 
     public ShortTestResult() {
         this.id = "";
         this.name = "";
         this.result = "";
+        this.testSpecificationLocation = "";
         this.dateTest = null;
     }
 
@@ -46,4 +48,8 @@ public class ShortTestResult {
     public void setDateTest(Date dateTest) {
         this.dateTest = dateTest;
     }
+
+    public String getTestSpecificationLocation() { return testSpecificationLocation; }
+
+    public void setTestSpecificationLocation(String testSpecificationLocation) { this.testSpecificationLocation = testSpecificationLocation; }
 }

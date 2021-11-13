@@ -7,9 +7,25 @@ import org.eclipse.jgit.errors.RepositoryNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Conversion {
+
+    public static void convert(Config config) throws IOException, GitAPIException {
+        if (config !=  null && config.isGenerateExcelTests()) {
+            List<File> analyzedFiles = new ArrayList<File>();
+            if (config.getMap() != null) {
+                config.getMap().forEach((k, v) -> {
+                    try {
+                        convertMarkdownDirectory(new File(v), config.getReportDir(), analyzedFiles);
+                    } catch (IOException | GitAPIException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }
+    }
 
     public static void convertExcelDirectory(File directory, String outFolder) throws IOException {
         for (File file: FileUtils.getRecursiveFilesWithExtension(directory, Constants.NEW_EXCEL_EXTENSION)) {
@@ -31,14 +47,15 @@ public class Conversion {
         }
     }
 
-    public static void convertMarkdownDirectory(File directory, String outFolder) throws IOException, GitAPIException {
+    public static void convertMarkdownDirectory(File directory, String outFolder, List analyzedFiles) throws IOException, GitAPIException {
         for (File file: FileUtils.getRecursiveFilesWithExtension(directory, Constants.MARKDOWN_EXTENSION)) {
-            String relativePath = FileUtils.getRelativePath(file, directory);
+            File rootTestsDir = FileUtils.findAncestralFolderWithName(directory, "Tests");
+            String relativePath = FileUtils.getRelativePath(file, rootTestsDir);
             String relativeFolder = "";
             if (relativePath.contains("/"))
                 relativeFolder = relativePath.substring(0, relativePath.lastIndexOf("/"));
             String out = outFolder+ File.separator + relativeFolder;
-            convertMarkdownFileToExcelFile(file, out);
+            convertMarkdownFileToExcelFile(file, out, analyzedFiles);
         }
     }
 
@@ -52,9 +69,11 @@ public class Conversion {
         }
     }
 
-    public static void convertMarkdownFileToExcelFile(File markdownInput, String outFolder) throws IOException, GitAPIException {
-        FileUtils.createFolderIfNotExists(outFolder);
+    public static void convertMarkdownFileToExcelFile(File markdownInput, String outFolder, List analyzedFiles) throws IOException, GitAPIException {
         System.out.println("Convert " + markdownInput.getAbsolutePath() + " to " + outFolder);
+        if ( analyzedFiles!= null && analyzedFiles.contains(markdownInput))
+            return;
+        FileUtils.createFolderIfNotExists(outFolder);
         TestCaseTemplate template = MarkdownTestCaseTemplate.readFromFile(markdownInput);
         try {
             GitUtils git = new GitUtils(markdownInput);
@@ -77,5 +96,6 @@ public class Conversion {
         }
 
         ExcelTestCaseTemplate.writeTemplateToFile(FileUtils.getFileNameWithoutExtension(markdownInput.getName()), outFolder, template);
+        analyzedFiles.add(markdownInput);
     }
 }

@@ -23,6 +23,7 @@ public interface Constants {
     String TEST_CASE_ID = "Test Case ID";
     String TEST_CASE_SCRIPT_LOCATION = "Test Case Script Location";
     String TEST_CASE_NAME = "Test Case Name";
+    String TEST_CASE__LOCATION = "Test Case Location";
     String TEST_CASE_DESCRIPTION = "Test Case Description";
     String TEST_CASE_CREATED_BY = "Created By";
     String TEST_CASE_CREATED_DATE = "Created Date";
