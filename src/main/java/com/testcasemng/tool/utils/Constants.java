@@ -49,4 +49,8 @@ public interface Constants {
 
     String REPORT_SUMMARY= "Summary";
     String REPORT_DETAILS= "Details";
+
+    String HTML_TITLE = "%s - %s";
+    String HTML_CHART_DATA = "[['Pass', %s],['Fail', %s],['Not executed', %s], ['Suspended', %s]]";
+    String HTML_CHART_TITLE = "Historical test results:";
 }

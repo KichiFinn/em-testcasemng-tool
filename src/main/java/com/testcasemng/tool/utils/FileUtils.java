@@ -99,4 +99,11 @@ public final class FileUtils {
         else
             return tmp;
     }
+
+    public static String replaceReportsToDocs(String reportsPath) throws IOException {
+        if (reportsPath.contains("Reports"))
+            return reportsPath.replaceFirst("Reports", "docs");
+        else
+            return reportsPath;
+    }
 }

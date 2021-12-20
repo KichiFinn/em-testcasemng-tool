@@ -8,12 +8,14 @@ public class ShortTestResult {
     private String result;
     private Date dateTest;
     private String testSpecificationLocation;
+    private String actualResults;
 
     public ShortTestResult() {
         this.id = "";
         this.name = "";
         this.result = "";
         this.testSpecificationLocation = "";
+        this.actualResults = "";
         this.dateTest = null;
     }
 
@@ -49,7 +51,19 @@ public class ShortTestResult {
         this.dateTest = dateTest;
     }
 
-    public String getTestSpecificationLocation() { return testSpecificationLocation; }
+    public String getTestSpecificationLocation() {
+        return testSpecificationLocation;
+    }
 
-    public void setTestSpecificationLocation(String testSpecificationLocation) { this.testSpecificationLocation = testSpecificationLocation; }
+    public void setTestSpecificationLocation(String testSpecificationLocation) {
+        this.testSpecificationLocation = testSpecificationLocation;
+    }
+
+    public String getActualResults() {
+        return actualResults;
+    }
+
+    public void setActualResults(String actualResults) {
+        this.actualResults = actualResults;
+    }
 }

@@ -201,6 +201,11 @@ public class GitUtils {
                     result.setDateTest(currentTemplate.getTestDate());
                     result.setId(currentTemplate.getTestcaseID());
                     result.setName(currentTemplate.getTestcaseName());
+                    String note = "";
+                    for (TestStep step : currentTemplate.getTestSteps()) {
+                        note = "Step " + Integer.toString(step.getNo()) + ": " + step.getActualResults() + "\n";
+                    }
+                    result.setActualResults(note.trim());
                     tests.add(result);
                     switch (currentTemplate.getTestResults()) {
                         case Constants.TEST_RESULT_PASS:

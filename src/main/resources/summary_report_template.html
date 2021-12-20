@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+<h1>%s</h1>
+<div id="piechart_div"></div>
+<h1>Test Cases Summary</h1>
+<p>Total runs: %d <span style="color: #00CA39;">Pass: %d</span> <span style="color: #FF0000;">Fail: %d</span> <span style="color: #B0B0B0;">Not executed: %d</span> <span style="color: #FF83D9;">Suspended: %d</span></p>
+<div id="table_div"></div>
+<script type="text/javascript">
+google.charts.load('current', {'packages':['corechart']});
+google.charts.load('current', {'packages':['table']});
+google.charts.setOnLoadCallback(drawChart);
+google.charts.setOnLoadCallback(drawTable);
+
+function drawChart() {
+var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Results');
+	data.addColumn('number', 'Percentage');
+    data.addRows(%s);
+  var options = {'title':'Results of %d test cases',
+                'width':550,
+                'height':400,
+                colors: ['#00CA39', '#FF0000', '#B0B0B0', '#FF83D9'],
+                sliceVisibilityThreshold:0,
+                is3D: false};
+
+  var chart = new google.visualization.PieChart(document.getElementById('piechart_div'));
+  chart.draw(data, options);
+}
+function drawTable() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Id');
+        data.addColumn('string', 'Name');
+        data.addColumn('string', 'Latest Test');
+        data.addColumn('string', 'Latest Result');
+        data.addColumn('string', 'Details');
+        data.addRows([%s]);
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+        var options = {showRowNumber: false, allowHtml: true};
+        table.draw(data, options);
+}
+</script>
+
+</body>
+</html>

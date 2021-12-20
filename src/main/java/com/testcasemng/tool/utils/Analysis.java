@@ -1,6 +1,7 @@
 package com.testcasemng.tool.utils;
 
 import com.testcasemng.tool.excel.ExcelTestCaseTemplate;
+import com.testcasemng.tool.html.HTMLReportTemplate;
 import com.testcasemng.tool.markdown.MarkdownTestCaseTemplate;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
@@ -17,8 +18,8 @@ public class Analysis {
         if (config.getMap() != null) {
             config.getMap().forEach((k, v) -> {
                 try {
-                    analyzeTestCases(new File(v), new File(config.getReportDir()), k , config.isGenerateExcelTests());
-                    analyzeFolder(new File(v), new File(config.getReportDir()), analyzedFiles);
+                    analyzeTestCases(new File(v), new File(config.getReportDir()), k , config.isGenerateExcelTests(), config.isGenerateHtmlReports());
+                    analyzeFolder(new File(v), new File(config.getReportDir()), analyzedFiles, config.isGenerateExcelTests(),config.isGenerateHtmlReports());
                 } catch (IOException | GitAPIException e) {
                     e.printStackTrace();
                 }
@@ -32,15 +33,15 @@ public class Analysis {
         File outputFolder = new File(output);
         if (inputFile.isDirectory()) {
             if (historical)
-                analyzeFolder(inputFile, outputFolder, new ArrayList<File>() );
+                analyzeFolder(inputFile, outputFolder, new ArrayList<File>(), true, true );
             else
-                analyzeTestCases(inputFile, outputFolder, "TotalAnalysis", true);
+                analyzeTestCases(inputFile, outputFolder, "TotalAnalysis", true, true);
         } else if (inputFile.isFile()) {
-            analyzeATestCase(inputFile, outputFolder);
+            analyzeATestCase(inputFile, outputFolder, true, true);
         }
     }
 
-    public static void analyzeFolder(File inputFolder, File outputFolder, List analyzedFiles) throws IOException, GitAPIException {
+    public static void analyzeFolder(File inputFolder, File outputFolder, List analyzedFiles, boolean generateExcelReport, boolean generateHTMLReport) throws IOException, GitAPIException {
         List<File> files = FileUtils.getRecursiveFilesWithExtension(inputFolder, Constants.MARKDOWN_EXTENSION);
         for (File file : files) {
             if ( analyzedFiles!= null && analyzedFiles.contains(file))
@@ -52,11 +53,11 @@ public class Analysis {
                 relativeFolder = relativePath.substring(0, relativePath.lastIndexOf("/"));
             String out = outputFolder.getPath()+ File.separator + relativeFolder;
             FileUtils.createFolderIfNotExists(out);
-            analyzeATestCase(file, new File(out));
+            analyzeATestCase(file, new File(out), generateExcelReport, generateHTMLReport);
             analyzedFiles.add(file);
         }
     }
-    public static void analyzeATestCase(File inputFile, File outputFolder) throws IOException, GitAPIException {
+    public static void analyzeATestCase(File inputFile, File outputFolder, boolean generateExcelReport, boolean generateHTMLReport) throws IOException, GitAPIException {
         AnalysisTemplate template = null;
         try {
             GitUtils git = new GitUtils(inputFile);
@@ -70,16 +71,26 @@ public class Analysis {
         }
 
         if (template != null) {
-            String excelOutfilePath = outputFolder.getPath() + File.separator + FileUtils.getFileNameWithoutExtension(inputFile.getName())
-                    + "Analysis.xlsx";
+            if (generateExcelReport) {
+                String excelOutfilePath = outputFolder.getPath() + File.separator + FileUtils.getFileNameWithoutExtension(inputFile.getName())
+                        + "Analysis.xlsx";
+                ExcelTestCaseTemplate.writeAnAnalysisTemplateToFile(template, excelOutfilePath);
+            }
+
+            if (generateHTMLReport) {
+                String htmlDirPath = FileUtils.replaceReportsToDocs(outputFolder.getPath());
+                FileUtils.createFolderIfNotExists(htmlDirPath);
+                String htmlOutfilePath = htmlDirPath + File.separator + FileUtils.getFileNameWithoutExtension(inputFile.getName()) + "Analysis.html";
+                HTMLReportTemplate.writeHistoricalAnalysisTemplateToFile(template, htmlOutfilePath);
+            }
+
             String markdownOutfilePath = outputFolder.getPath() + File.separator + FileUtils.getFileNameWithoutExtension(inputFile.getName())
                     + "Analysis.MD";
-            ExcelTestCaseTemplate.writeAnAnalysisTemplateToFile(template, excelOutfilePath);
             MarkdownTestCaseTemplate.writeAnAnalysisTemplateToFile(template, markdownOutfilePath);
         }
     }
 
-    public static void analyzeTestCases(File directory, File outputFolder, String reportName, boolean generateExcelReport) throws IOException {
+    public static void analyzeTestCases(File directory, File outputFolder, String reportName, boolean generateExcelReport, boolean generateHTMLReport) throws IOException {
         System.out.println("Generating test result summary ...");
         AnalysisTemplate template = new AnalysisTemplate();
         List<File> files = FileUtils.getRecursiveFilesWithExtension(directory, Constants.MARKDOWN_EXTENSION);
@@ -95,6 +106,11 @@ public class Analysis {
                 result.setTestSpecificationLocation(".." + File.separator + "Tests" + File.separator + relativePath);
                 result.setDateTest(testCaseTemplate.getTestDate());
                 result.setResult(testCaseTemplate.getTestResults());
+                String note = "";
+                for (TestStep step : testCaseTemplate.getTestSteps()) {
+                    note = "Step " + Integer.toString(step.getNo()) + ": " + step.getActualResults() + "\n";
+                }
+                result.setActualResults(note.trim());
                 template.getTests().add(result);
                 switch (testCaseTemplate.getTestResults()) {
                     case Constants.TEST_RESULT_PASS:
@@ -119,6 +135,14 @@ public class Analysis {
             String excelFilePath = outputFolder.getPath() + File.separator + reportName + ".xlsx";
             ExcelTestCaseTemplate.writeTotalAnalysisTemplateToFile(template, excelFilePath);
         }
+
+        if (generateHTMLReport) {
+            String htmlDirPath = FileUtils.replaceReportsToDocs(outputFolder.getPath());
+            FileUtils.createFolderIfNotExists(htmlDirPath);
+            String htmlOutfilePath = htmlDirPath + File.separator + reportName + ".html";
+            HTMLReportTemplate.writeSummaryAnalysisTemplateToFile(template, htmlOutfilePath, reportName);
+        }
+
         String markdownFilePath = outputFolder.getPath() + File.separator + reportName + ".MD";
         MarkdownTestCaseTemplate.writeTotalAnalysisTemplateToFile(template, markdownFilePath);
     }
