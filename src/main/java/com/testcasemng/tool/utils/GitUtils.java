@@ -203,7 +203,7 @@ public class GitUtils {
                     result.setName(currentTemplate.getTestcaseName());
                     String note = "";
                     for (TestStep step : currentTemplate.getTestSteps()) {
-                        note = "Step " + Integer.toString(step.getNo()) + ": " + step.getActualResults() + "\n";
+                        note += "Step " + Integer.toString(step.getNo()) + ": " + step.getActualResults() + "<br/>";
                     }
                     result.setActualResults(note.trim());
                     tests.add(result);

@@ -9,6 +9,7 @@ public interface Constants {
     String OLD_EXCEL_EXTENSION = "xls";
     String NEW_EXCEL_EXTENSION = "xlsx";
     String MARKDOWN_EXTENSION = "md";
+    String HTML_EXTENSION = "html";
 
     String MARKDOWN_HEADER = "#";
     String MARKDOWN_LEVEL_SEPARATOR = "\t";
@@ -53,4 +54,7 @@ public interface Constants {
     String HTML_TITLE = "%s - %s";
     String HTML_CHART_DATA = "[['Pass', %s],['Fail', %s],['Not executed', %s], ['Suspended', %s]]";
     String HTML_CHART_TITLE = "Historical test results:";
+
+    String HREF = "<a href=\"%s\">%s</a> <br>";
+    String INDEX = "<html><head><title>Test Management</title></head><body><h1>Test Results</h1><hr>%s</body></html>";
 }

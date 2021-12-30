@@ -36,7 +36,7 @@ function drawTable() {
         data.addColumn('string', 'Actual Results');
         data.addRows([%s]);
         var table = new google.visualization.Table(document.getElementById('table_div'));
-        var options = {showRowNumber: false};
+        var options = {showRowNumber: true, allowHtml:true};
         table.draw(data, options);
 }
 </script>
